@@ -1,3 +1,8 @@
+# DL-DIY potential project ideas
+
+- read the paper and understand the approach
+- once you are done with CIFAR10, reproduce the results with other datasets like FashionMNIST...
+
 PyTorch implementation of VQ-VAE by [van den Oord et al., 2017] applied to CIFAR10 dataset by [Alex Krizhevsky, 2009] using classes, inspired from the code of [zalandoresearch/pytorch-vq-vae] and [deepmind/sonnet].
 
 # Results
