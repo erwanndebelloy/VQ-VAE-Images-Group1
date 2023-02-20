@@ -78,4 +78,5 @@ class Evaluator(object):
 
     def _save_image(self, img, path):
         npimg = img.numpy()
+        npimg = np.clip(npimg, 0., 1.)
         plt.imsave(path, np.transpose(npimg, (1, 2, 0)))
