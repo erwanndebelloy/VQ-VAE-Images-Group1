@@ -10,4 +10,5 @@ PATH = 'results\shuffle\model.pth'
 model = AutoEncoder()
 model.load_state_dict(torch.load(PATH))
 model.eval()
-Evaluator('cpu', model, dataset)
+ev = Evaluator('cpu', model, dataset)
+ev.save_validation_reconstructions_plot('results\test')
