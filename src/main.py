@@ -67,7 +67,6 @@ if __name__ == "__main__":
     results_path = '..' + os.sep + args.results_path
     if not os.path.isdir(results_path):
         os.mkdir(results_path)
-    
     dataset_path = '..' + os.sep + args.data_path
 
     dataset = Cifar10Dataset(configuration.batch_size, dataset_path, configuration.shuffle_dataset) # Create an instance of CIFAR10 dataset
