@@ -81,6 +81,7 @@ class Decoder(nn.Module):
             nn.init.kaiming_normal_(self._conv_trans_2.weight)
 
     def forward(self, inputs):
+    
         x = self._conv_1(inputs)
         
         x = self._residual_stack(x)
@@ -89,5 +90,5 @@ class Decoder(nn.Module):
 
         x = F.relu(x)
         x = self._conv_trans_2(x)
-        
+        #print('sortie de decoder',x.size())
         return x

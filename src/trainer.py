@@ -61,6 +61,8 @@ class Trainer(object):
             It indicates how many codes are 'active' on average.
             """
             vq_loss, data_recon, perplexity = self._model(data)
+            #print(data_recon.size())
+            #print(data.size())
             recon_error = torch.mean((data_recon - data)**2) / self._dataset.train_data_variance
             loss = recon_error + vq_loss
             loss.backward()

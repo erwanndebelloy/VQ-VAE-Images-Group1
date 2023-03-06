@@ -28,6 +28,7 @@ from auto_encoder import AutoEncoder
 from trainer import Trainer
 from evaluator import Evaluator
 from cifar10_dataset import Cifar10Dataset
+from celeba_dataset import CelebADataset
 from configuration import Configuration
 
 import torch
@@ -70,7 +71,7 @@ if __name__ == "__main__":
     
     dataset_path = '..' + os.sep + args.data_path
 
-    dataset = Cifar10Dataset(configuration.batch_size, dataset_path, configuration.shuffle_dataset) # Create an instance of CIFAR10 dataset
+    dataset = CelebADataset(configuration.batch_size, dataset_path, configuration.shuffle_dataset) # Create an instance of CIFAR10 dataset
     auto_encoder = AutoEncoder(device, configuration).to(device) # Create an AutoEncoder model using our GPU device
 
     optimizer = optim.Adam(auto_encoder.parameters(), lr=configuration.learning_rate, amsgrad=True) # Create an Adam optimizer instance

@@ -81,6 +81,7 @@ class Encoder(nn.Module):
         )
 
     def forward(self, inputs):
+        #print('entree encoder',inputs.size())
         x = self._conv_1(inputs)
         x = F.relu(x)
         
@@ -89,4 +90,6 @@ class Encoder(nn.Module):
         
         x = self._conv_3(x)
 
-        return self._residual_stack(x)
+        x= self._residual_stack(x)
+        #print('sortie de l encoder',x.size())
+        return x
