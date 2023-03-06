@@ -18,7 +18,7 @@ class CelebADataset(object):
             transform=transforms.Compose([
                 transforms.ToTensor(),
                 transforms.Normalize((0.5,0.5,0.5), (0.5,0.5,0.5)),
-                transforms.Resize((32,32))
+                transforms.Resize((64,64))
             ])
         )
 
@@ -29,7 +29,7 @@ class CelebADataset(object):
             transform=transforms.Compose([
                 transforms.ToTensor(),
                 transforms.Normalize((0.5,0.5,0.5), (0.5,0.5,0.5)),
-                transforms.Resize((32,32))
+                transforms.Resize((64,64))
             ])
         )
 
