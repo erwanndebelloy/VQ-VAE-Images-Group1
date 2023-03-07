@@ -27,7 +27,7 @@
 
 from encoder import Encoder
 from decoder import Decoder
-from vector_quantizer import VectorQuantizer
+from vector_quantizer import VectorQuantizer, Reparameterizer
 from vector_quantizer_ema import VectorQuantizerEMA
 
 import torch.nn as nn
@@ -44,6 +44,7 @@ class AutoEncoder(nn.Module):
         Create the Encoder with a fixed number of channel
         (3 as specified in the paper).
         """
+
         self._encoder = Encoder(
             3,
             configuration.num_hiddens,
@@ -58,22 +59,28 @@ class AutoEncoder(nn.Module):
             kernel_size=1, 
             stride=1
         )
-
-        if configuration.decay > 0.0:
-            self._vq_vae = VectorQuantizerEMA(
-                device,
-                configuration.num_embeddings,
-                configuration.embedding_dim, 
-                configuration.commitment_cost,
-                configuration.decay
-            )
+        
+        if configuration.vanilla_vae: # Basic VAE for comparaison
+            self._vq_vae = Reparameterizer(
+                    device,
+                    configuration.embedding_dim, 
+                )
         else:
-            self._vq_vae = VectorQuantizer(
-                device,
-                configuration.num_embeddings,
-                configuration.embedding_dim,
-                configuration.commitment_cost
-            )
+            if configuration.decay > 0.0:
+                self._vq_vae = VectorQuantizerEMA(
+                    device,
+                    configuration.num_embeddings,
+                    configuration.embedding_dim, 
+                    configuration.commitment_cost,
+                    configuration.decay
+                )
+            else:
+                self._vq_vae = VectorQuantizer(
+                    device,
+                    configuration.num_embeddings,
+                    configuration.embedding_dim,
+                    configuration.commitment_cost
+                )
 
         self._decoder = Decoder(
             configuration.embedding_dim,

@@ -49,7 +49,9 @@ class Evaluator(object):
 
         (train_originals, _) = next(iter(self._dataset.training_loader))
         train_originals = train_originals.to(self._device)
-        _, self._train_reconstructions, _, _ = self._model.vq_vae(train_originals)
+
+        vq_output_train = self._model.pre_vq_conv(self._model.encoder(train_originals))
+        _, self._train_reconstructions, _, _ = self._model.vq_vae(vq_output_train)
 
     def save_original_images_plot(self, path):
         self._save_image(make_grid(self._valid_originals.cpu()+0.5), path)
