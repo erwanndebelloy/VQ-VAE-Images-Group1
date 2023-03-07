@@ -63,6 +63,7 @@ if __name__ == "__main__":
     configuration = Configuration.build_from_args(args)
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu') # Use GPU if cuda is available
+    print("device = ", device)
 
     # Set the result path and create the directory if it doesn't exist
     results_path = '..' + os.sep + args.results_path
