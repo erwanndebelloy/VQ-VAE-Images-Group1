@@ -24,7 +24,7 @@ class FoodDataset(object):
 
         self._validation_data = datasets.Food101(
             root=path,
-            split='valid',
+            split='test',
             download=True,
             target_transform=transforms.Compose([
                 transforms.ToTensor(),

@@ -83,3 +83,4 @@ if __name__ == "__main__":
     evaluator.reconstruct() # Reconstruct our images from the embedded space
     evaluator.save_original_images_plot(results_path + os.sep + args.original_images_name) # Save the original images for comparaison purpose
     evaluator.save_validation_reconstructions_plot(results_path + os.sep + args.validation_images_name) # Reconstruct the decoded images and save them
+    evaluator.save_embedding_plot(results_path) #save embeddings plot
