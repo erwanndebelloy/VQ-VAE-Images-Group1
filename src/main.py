@@ -57,6 +57,7 @@ if __name__ == "__main__":
     parser.add_argument('--model_name', nargs='?', default='model.pth', type=str, help='The file name of trained model')
     parser.add_argument('--original_images_name', nargs='?', default='original_images.png', type=str, help='The file name of the original images used in evaluation')
     parser.add_argument('--validation_images_name', nargs='?', default='validation_images.png', type=str, help='The file name of the reconstructed images used in evaluation')
+    parser.add_argument('--generation_images_name', nargs='?', default='generation_images.png', type=str, help='The file name of the generated images')
     parser.add_argument('--vanilla_vae', nargs='?', default=False, type=bool, help='False by default for VQ VAE')
     args = parser.parse_args()
 
@@ -97,9 +98,11 @@ if __name__ == "__main__":
 
     evaluator = Evaluator(device, auto_encoder, dataset) # Create en Evaluator instance to evaluate our trained model
     evaluator.reconstruct() # Reconstruct our images from the embedded space
+    evaluator.generate_uniform() # Generate Uniform
     if configuration.vanilla_vae:
         evaluator.save_original_images_plot(results_path + os.sep + 'vanilla_vae_' + args.original_images_name) # Save the original images for comparaison purpose
         evaluator.save_validation_reconstructions_plot(results_path + os.sep + 'vanilla_vae_' + args.validation_images_name) # Reconstruct the decoded images and save them
     else:
         evaluator.save_original_images_plot(results_path + os.sep + args.original_images_name) # Save the original images for comparaison purpose
         evaluator.save_validation_reconstructions_plot(results_path + os.sep + args.validation_images_name) # Reconstruct the decoded images and save them
+        evaluator.save_generations_plot(results_path + os.sep + args.generation_images_name) # Reconstruct the decoded images and save them

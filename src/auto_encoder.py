@@ -107,6 +107,12 @@ class AutoEncoder(nn.Module):
         x_recon = self._decoder(quantized)
 
         return loss, x_recon, perplexity
+    
+    def generate_uniform(self, n_generate):
+        generated_quantized = self._vq_vae.generate_uniform(n_generate)
+        x_recon = self._decoder(generated_quantized)
+
+        return x_recon
 
     def save(self, path):
         torch.save(self.state_dict(), path)

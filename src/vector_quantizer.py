@@ -88,6 +88,8 @@ class VectorQuantizer(nn.Module):
         # Convert inputs from BCHW -> BHWC
         inputs = inputs.permute(0, 2, 3, 1).contiguous()
         input_shape = inputs.shape
+        self.input_shape_H = input_shape[1]
+        self.input_shape_W = input_shape[2]
         
         # Flatten input
         flat_input = inputs.view(-1, self._embedding_dim)
@@ -116,45 +118,24 @@ class VectorQuantizer(nn.Module):
         
         # Convert quantized from BHWC -> BCHW
         return loss, quantized.permute(0, 3, 1, 2).contiguous(), perplexity, encodings
+    
+    def generate_uniform(self, n_generate):
+        """
+        Generates the quantized vector from the encoding indices
+        """
+        # Encoding
+        encoding_indices_size = n_generate * self.input_shape_H * self.input_shape_W
+        encoding_indices = torch.randint(low=0, high=self._num_embeddings, size=(encoding_indices_size,1))
+        encodings = torch.zeros(encoding_indices.shape[0], self._num_embeddings).to(self._device)
+        encodings.scatter_(1, encoding_indices, 1)
+        
+        # Quantize and unflatten
+        quantized = torch.matmul(encodings, self._embedding.weight).view((n_generate, self.input_shape_H, self.input_shape_W, self._embedding_dim)) #BHWC
+        
+        # Convert quantized from BHWC -> BCHW
+        quantized = quantized.permute(0, 3, 1, 2).contiguous()
+        return quantized
 
     @property
     def embedding(self):
         return self._embedding
-
-# class Reparameterizer(nn.Module):
-#     """
-#     Vanilla VAE
-#     """
-    
-#     def __init__(self, device, embedding_dim):
-#         super(Reparameterizer, self).__init__()
-
-#         self._device = device
-        
-#         self.conv_mu = nn.Sequential(nn.ReLU(),
-#                     nn.Conv2d(embedding_dim, out_channels=embedding_dim,
-#                               kernel_size=7, stride= 1, padding  = 3),
-#                     nn.BatchNorm2d(embedding_dim))
-        
-#         self.conv_log_var = nn.Sequential(nn.ReLU(),
-#                     nn.Conv2d(embedding_dim, out_channels=embedding_dim,
-#                               kernel_size= 7, stride= 1, padding  = 3),
-#                     nn.BatchNorm2d(embedding_dim))
-
-#     def forward(self, inputs):
-#         # input BCHW 
-#         mu = self.conv_mu(inputs)
-#         log_var = self.conv_log_var(inputs)
-#         std = torch.exp(log_var/2)
-#         eps = torch.randn_like(std)
-#         output = mu + eps * std
-
-#         kl_div = -0.5 * torch.sum(1 + log_var - mu.pow(2) - log_var.exp())
-#         perplexity = torch.zeros(1)
-#         encodings = torch.zeros(1)
-
-#         return kl_div, output, perplexity, encodings
-
-#     @property
-#     def embedding(self):
-#         return 0

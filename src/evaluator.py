@@ -56,12 +56,19 @@ class Evaluator(object):
         # _, self._train_reconstructions, _, _ = self._model.vq_vae(vq_output_train)
 
         _, self._train_reconstructions, _ = self._model.forward(train_originals)
+    
+    def generate_uniform(self, n_generate = 32):
+        self._model.eval()
+        self._generations = self._model.generate_uniform(n_generate)
 
     def save_original_images_plot(self, path):
         self._save_image(make_grid(self._valid_originals.cpu()+0.5), path)
 
     def save_validation_reconstructions_plot(self, path):
         self._save_image(make_grid(self._valid_reconstructions.cpu().data)+0.5, path)
+    
+    def save_generations_plot(self, path):
+        self._save_image(make_grid(self._generations.cpu().data)+0.5, path)
 
     def save_embedding_plot(self, path):
         try:
