@@ -121,40 +121,40 @@ class VectorQuantizer(nn.Module):
     def embedding(self):
         return self._embedding
 
-class Reparameterizer(nn.Module):
-    """
-    Vanilla VAE
-    """
+# class Reparameterizer(nn.Module):
+#     """
+#     Vanilla VAE
+#     """
     
-    def __init__(self, device, embedding_dim):
-        super(Reparameterizer, self).__init__()
+#     def __init__(self, device, embedding_dim):
+#         super(Reparameterizer, self).__init__()
 
-        self._device = device
+#         self._device = device
         
-        self.conv_mu = nn.Sequential(nn.ReLU(),
-                    nn.Conv2d(embedding_dim, out_channels=embedding_dim,
-                              kernel_size= 3, stride= 1, padding  = 1),
-                    nn.BatchNorm2d(embedding_dim))
+#         self.conv_mu = nn.Sequential(nn.ReLU(),
+#                     nn.Conv2d(embedding_dim, out_channels=embedding_dim,
+#                               kernel_size=7, stride= 1, padding  = 3),
+#                     nn.BatchNorm2d(embedding_dim))
         
-        self.conv_log_var = nn.Sequential(nn.ReLU(),
-                    nn.Conv2d(embedding_dim, out_channels=embedding_dim,
-                              kernel_size= 3, stride= 1, padding  = 1),
-                    nn.BatchNorm2d(embedding_dim))
+#         self.conv_log_var = nn.Sequential(nn.ReLU(),
+#                     nn.Conv2d(embedding_dim, out_channels=embedding_dim,
+#                               kernel_size= 7, stride= 1, padding  = 3),
+#                     nn.BatchNorm2d(embedding_dim))
 
-    def forward(self, inputs):
-        # input BCHW 
-        mu = self.conv_mu(inputs)
-        log_var = self.conv_log_var(inputs)
-        std = torch.exp(log_var/2)
-        eps = torch.randn_like(std)
-        output = mu + eps * std
+#     def forward(self, inputs):
+#         # input BCHW 
+#         mu = self.conv_mu(inputs)
+#         log_var = self.conv_log_var(inputs)
+#         std = torch.exp(log_var/2)
+#         eps = torch.randn_like(std)
+#         output = mu + eps * std
 
-        kl_div = - 0.5 * torch.sum(1 + log_var - mu.pow(2) - log_var.exp())
-        perplexity = torch.zeros(1)
-        encodings = torch.zeros(1)
+#         kl_div = -0.5 * torch.sum(1 + log_var - mu.pow(2) - log_var.exp())
+#         perplexity = torch.zeros(1)
+#         encodings = torch.zeros(1)
 
-        return kl_div, output, perplexity, encodings
+#         return kl_div, output, perplexity, encodings
 
-    @property
-    def embedding(self):
-        return 0
+#     @property
+#     def embedding(self):
+#         return 0

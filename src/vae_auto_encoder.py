@@ -25,7 +25,7 @@
  #   SOFTWARE.                                                                       #
  #####################################################################################
 
-from encoder import Encoder
+from vae_encoder import VAE_Encoder
 from decoder import Decoder
 from vector_quantizer import VectorQuantizer
 from vector_quantizer_ema import VectorQuantizerEMA
@@ -35,17 +35,17 @@ import torch
 import os
 
 
-class AutoEncoder(nn.Module):
+class VAE_AutoEncoder(nn.Module):
     
     def __init__(self, device, configuration):
-        super(AutoEncoder, self).__init__()
+        super(VAE_AutoEncoder, self).__init__()
         
         """
         Create the Encoder with a fixed number of channel
         (3 as specified in the paper).
         """
 
-        self._encoder = Encoder(
+        self._encoder = VAE_Encoder(
             3,
             configuration.num_hiddens,
             configuration.num_residual_layers, 
@@ -53,29 +53,21 @@ class AutoEncoder(nn.Module):
             configuration.use_kaiming_normal
         )
 
-        self._pre_vq_conv = nn.Conv2d(
+
+        self._pre_vq_conv_mu = nn.Conv2d(
+        in_channels=configuration.num_hiddens, 
+        out_channels=configuration.embedding_dim,
+        kernel_size=1, 
+        stride=1
+        )
+
+        self._pre_vq_conv_log_var = nn.Conv2d(
             in_channels=configuration.num_hiddens, 
             out_channels=configuration.embedding_dim,
             kernel_size=1, 
             stride=1
         )
         
-        if configuration.decay > 0.0:
-            self._vq_vae = VectorQuantizerEMA(
-                device,
-                configuration.num_embeddings,
-                configuration.embedding_dim, 
-                configuration.commitment_cost,
-                configuration.decay
-            )
-        else:
-            self._vq_vae = VectorQuantizer(
-                device,
-                configuration.num_embeddings,
-                configuration.embedding_dim,
-                configuration.commitment_cost
-            )
-
         self._decoder = Decoder(
             configuration.embedding_dim,
             configuration.num_hiddens, 
@@ -84,13 +76,6 @@ class AutoEncoder(nn.Module):
             configuration.use_kaiming_normal
         )
 
-    @property
-    def vq_vae(self):
-        return self._vq_vae
-
-    @property
-    def pre_vq_conv(self):
-        return self._pre_vq_conv
 
     @property
     def encoder(self):
@@ -99,12 +84,23 @@ class AutoEncoder(nn.Module):
     @property
     def decoder(self):
         return self._decoder
+    
+    def reparameterize(self, mu, log_var):
+        # For vanilla VAE
+        std = torch.exp(log_var/2)
+        eps = torch.randn_like(std)
+        return mu + eps * std
 
     def forward(self, x):
-        z = self._encoder(x)
-        z = self._pre_vq_conv(z)
-        loss, quantized, perplexity, _ = self._vq_vae(z)
-        x_recon = self._decoder(quantized)
+        z_mu, z_log_var = self._encoder(x)
+        mu = self._pre_vq_conv_mu(z_mu)
+        log_var = self._pre_vq_conv_log_var(z_log_var)
+        z = self.reparameterize(mu, log_var)
+        x_recon = self._decoder(z)
+
+        # loss = -0.5 * torch.sum(1 + log_var - mu.pow(2) - log_var.exp()) #kl div
+        loss = torch.mean(-0.5 * torch.sum(1 + log_var - mu ** 2 - log_var.exp(), dim = [1,2,3]), dim = 0)
+        perplexity = torch.zeros(1)
 
         return loss, x_recon, perplexity
 
@@ -113,7 +109,7 @@ class AutoEncoder(nn.Module):
 
     @staticmethod
     def load(self, path, configuration, device):
-        model = AutoEncoder(device, configuration)
+        model = VAE_AutoEncoder(device, configuration)
         model.load_state_dict(torch.load(path, map_location=device))
         return model
 

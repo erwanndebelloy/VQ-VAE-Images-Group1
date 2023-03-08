@@ -44,6 +44,7 @@ class Trainer(object):
         self._optimizer = optimizer
         self._dataset = dataset
         self._verbose = verbose
+        self._train_loss = []
         self._train_res_recon_error = []
         self._train_res_perplexity = []
 
@@ -69,10 +70,12 @@ class Trainer(object):
             
             self._train_res_recon_error.append(recon_error.item())
             self._train_res_perplexity.append(perplexity.item())
+            self._train_loss.append(loss.item())
 
             if self._verbose and (i % (num_training_updates / 10) == 0):
                 print('Iteration #{}'.format(i + 1))
                 print('Reconstruction error: %.3f' % np.mean(self._train_res_recon_error[-100:]))
+                print('Total loss: %.3f' % np.mean(self._train_loss[-100:]))
                 print('Perplexity: %.3f' % np.mean(self._train_res_perplexity[-100:]))
                 print()
 
