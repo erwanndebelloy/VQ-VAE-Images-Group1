@@ -125,7 +125,7 @@ class VectorQuantizer(nn.Module):
         """
         # Encoding
         encoding_indices_size = n_generate * self.input_shape_H * self.input_shape_W
-        encoding_indices = torch.randint(low=0, high=self._num_embeddings, size=(encoding_indices_size,1))
+        encoding_indices = torch.randint(low=0, high=self._num_embeddings, size=(encoding_indices_size,1)).to(self._device)
         encodings = torch.zeros(encoding_indices.shape[0], self._num_embeddings).to(self._device)
         encodings.scatter_(1, encoding_indices, 1)
         
