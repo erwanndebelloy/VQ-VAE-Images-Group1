@@ -30,6 +30,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import savgol_filter
 import os
+import torch.nn.functional as F
 
 def cycle(iterable):
     while True:
@@ -61,7 +62,8 @@ class Trainer(object):
             It indicates how many codes are 'active' on average.
             """
             vq_loss, data_recon, perplexity = self._model(data)
-            recon_error = torch.mean((data_recon - data)**2) / self._dataset.train_data_variance
+            #recon_error = torch.mean((data_recon - data)**2) / self._dataset.train_data_variance
+            recon_error = F.mse_loss(data_recon,data)
             loss = recon_error + vq_loss
             loss.backward()
 
