@@ -25,7 +25,7 @@
  #####################################################################################
 
 from auto_encoder import AutoEncoder
-from trainer import Trainer
+from trainer_celeba import Trainer
 from evaluator import Evaluator
 from celebA import CelebADataset
 from configuration import Configuration
